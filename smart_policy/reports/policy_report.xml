@@ -1,0 +1,270 @@
+<odoo>
+    <data>
+         <report id="opp_report"
+                string="Proposals"
+                model="crm.lead"
+                report_type="qweb-pdf"
+                file="smart_policy.opp_report_document"
+                name="smart_policy.opp_report_document"
+        />
+
+<report id="policy_report"
+                string="Policy"
+                model="policy.broker"
+                report_type="qweb-pdf"
+                file="smart_policy.policy_report_document"
+                name="smart_policy.policy_report_document"
+        />
+
+         <template id="opp_report_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <h3><strong>Proposals: <span t-field="o.name"/></strong></h3>
+                            <div class="row">
+                                <div class="col-xs-6" t-if="o.partner_id">
+                                    <t>
+                                        <strong>Customer: </strong>
+                                    </t><span t-field="o.partner_id"/>
+                                </div>
+                                <div class="col-xs-6" t-if="o.user_id">
+                                    <t>
+                                        <strong>Sales person: </strong>
+                                    </t><span t-field="o.user_id"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6" t-if="o.insurance_type">
+                                    <t>
+                                        <strong>Insurance Type: </strong>
+                                    </t><span t-field="o.insurance_type"/>
+                                </div>
+                                <div class="col-xs-6" t-if="o.LOB">
+                                    <t>
+                                        <strong>Line of Business: </strong>
+                                    </t><span t-field="o.LOB"/>
+                                </div>
+                            </div>
+                            <div class="row">
+
+                            </div>
+                            <br/>
+
+                            <!--<table class="table table-condensed">-->
+                            <!--<h4>Risks:</h4>-->
+                            <!--<thead>-->
+                            <!--<tr>-->
+                            <!--<th>Risk </th>-->
+                            <!--</tr>-->
+                            <!--</thead>-->
+                            <!--<tbody>-->
+                            <!--<tr t-foreach="o.objectrisks" t-as="risk">-->
+                            <!--<td><span t-field="risk.risk_description"/></td>-->
+                            <!--</tr>-->
+                            <!--</tbody>-->
+                            <!--</table>-->
+                            <!--<br/>-->
+                            <table class="" t-foreach="o.proposal_opp" t-as="p">
+                                <h4>Propsal:</h4>
+                                <thead>
+                                    <tr>
+                                        <th>Insurer</th>
+                                        <th>Product</th>
+                                        <th>Premium</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="totalprem" t-value="0"/>
+
+                                    <tr>
+                                        <td><span t-field="p.Company"/></td>
+                                        <td><span t-field="p.product_pol"/></td>
+                                        <td><span t-field="p.premium"/></td>
+                                        <tr>
+                                            <td colspan="3">
+                                                <table class="table table-condensed">
+                                                    <h4>Risks:</h4>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Risk </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr t-foreach="o.objectrisks" t-as="risk">
+                                                            <td><span t-field="risk.risk_description"/></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <table class="table table-condensed">
+                                                    <h4>Covers:</h4>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Risk</th>
+                                                            <th>Cover</th>
+                                                            <th>SI</th>
+                                                            <th>Rate</th>
+                                                            <th>Net Premium</th>
+                                                            <th>Limit one</th>
+                                                            <th>Limit total</th>
+                                                            <th>Deductible</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        <tr t-foreach="o.coverage_line" t-as="cover">
+                                                            <t t-if="cover.proposal_id.id==p.id" >
+                                                                <td align="right"><span t-esc="cover.risk_id_covers.risk_description"/></td>
+                                                                <td align="right"><span t-esc="cover.covers.Name"/></td>
+                                                                <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.sum_insured))"/></td>
+                                                                <td align="right"><span t-esc="cover.rate"/></td>
+                                                                <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.net_premium))"/></td>
+                                                                <t t-set="totalprem" t-value="totalprem+cover.net_premium"/>
+                                                                <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.limitone))"/></td>
+                                                                <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.limittotal))"/></td>
+                                                                <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.deductible))"/></td>
+
+                                                            </t>
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td align="right">  <span t-esc="'{0:,.2f}'.format(int(totalprem))"/></td>
+
+                                                        </tr>
+                                                    </tbody>
+
+                                                </table>
+                                            </td>
+                                        </tr>
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+
+                </t>
+            </t>
+
+        </template>
+        <template id="policy_report_document">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <h3><strong>Policy: <span t-field="o.std_id"/></strong></h3>
+                            <div class="row">
+                                <div class="col-xs-6" t-if="o.customer">
+                                    <t>
+                                        <strong>Customer: </strong>
+                                    </t><span t-field="o.customer"/>
+                                </div>
+                                <div class="col-xs-6" t-if="o.salesperson">
+                                    <t>
+                                        <strong>Sales person: </strong>
+                                    </t><span t-field="o.salesperson"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6" t-if="o.insurance_type">
+                                    <t>
+                                        <strong>Insurance Type: </strong>
+                                    </t><span t-field="o.insurance_type"/>
+                                </div>
+                                <div class="col-xs-6" t-if="o.line_of_bussines">
+                                    <t>
+                                        <strong>Line of Business: </strong>
+                                    </t><span t-field="o.line_of_bussines"/>
+                                </div>
+                            </div>
+
+                            <br/>
+
+                            <table class="table table-condensed">
+                                <h4>Risks:</h4>
+                                <thead>
+                                    <tr>
+                                        <th>Risk </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.new_risk_ids" t-as="risk">
+
+                                        <td><span t-field="risk.risk_description"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br/>
+
+
+
+                            <table class="table table-condensed">
+                                <h4>Covers lines:</h4>
+                                <thead>
+                                    <tr>
+                                        <th>Risk </th>
+
+                                        <th>Cover</th>
+                                        <th>SI</th>
+                                        <th>Rate</th>
+                                        <th>Net Premium</th>
+                                        <th>Limit one</th>
+                                        <th>Limit total</th>
+                                        <th>Deductible</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="totalprem" t-value="0"/>
+
+                                    <tr t-foreach="o.name_cover_rel_ids" t-as="cover">
+                                        <td align="right"><span t-esc="cover.riskk.risk_description"/></td>
+                                        <td align="right"><span t-esc="cover.name1.Name"/></td>
+                                        <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.sum_insure))"/></td>
+                                        <td align="right"><span t-esc="cover.rate"/></td>
+                                        <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.net_perimum))"/></td>
+                                        <t t-set="totalprem" t-value="totalprem+cover.net_perimum"/>
+                                        <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.limitone))"/></td>
+                                        <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.limittotal))"/></td>
+                                        <td align="right"><span t-esc="'{0:,.2f}'.format(int(cover.deductible))"/></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td align="right">  <span t-esc="'{0:,.2f}'.format(int(totalprem))"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+
+                </t>
+            </t>
+
+        </template>
+
+        <odoo>
+    <data>
+
+        <template id="report_quotation_inherit_demo" inherit_id="account.report_overdue_document">
+            <xpath expr="//table[@class='table table-condensed']//thead//tr//th[2]" position="replace">
+
+            </xpath>
+        </template>
+    </data>
+</odoo>
+
+    </data>
+</odoo>
